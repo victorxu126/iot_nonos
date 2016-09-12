@@ -139,3 +139,44 @@ user_light_init(void)
 }
 #endif
 
+#define LED_D1_IO_MUX     PERIPHS_IO_MUX_MTDO_U
+#define LED_D1_IO_NUM     15
+#define LED_D1_IO_FUNC    FUNC_GPIO15
+LOCAL os_timer_t led_d1_timer;
+LOCAL uint8 led_d1_level = 0;
+
+void ICACHE_FLASH_ATTR
+led_d1_init(void)
+{
+    PIN_FUNC_SELECT(LED_D1_IO_MUX, LED_D1_IO_FUNC);
+}
+
+void ICACHE_FLASH_ATTR
+led_d1_output(uint8 level)
+{
+    GPIO_OUTPUT_SET(GPIO_ID_PIN(LED_D1_IO_NUM), level);
+}
+
+LOCAL void ICACHE_FLASH_ATTR
+led_d1_timer_cb(void)
+{
+	led_d1_level = (~led_d1_level) & 0x01;
+    GPIO_OUTPUT_SET(GPIO_ID_PIN(LED_D1_IO_NUM), led_d1_level);
+}
+
+void ICACHE_FLASH_ATTR
+led_d1_timer_init(void)
+{
+    os_timer_disarm(&led_d1_timer);
+    os_timer_setfn(&led_d1_timer, (os_timer_func_t *)led_d1_timer_cb, NULL);
+    os_timer_arm(&led_d1_timer, 2000, 1);
+    led_d1_level = 0;
+    GPIO_OUTPUT_SET(GPIO_ID_PIN(LED_D1_IO_NUM), led_d1_level);
+}
+
+void ICACHE_FLASH_ATTR
+led_d1_timer_done(void)
+{
+    os_timer_disarm(&led_d1_timer);
+    GPIO_OUTPUT_SET(GPIO_ID_PIN(LED_D1_IO_NUM), 0);
+}

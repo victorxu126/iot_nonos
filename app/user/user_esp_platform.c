@@ -1368,7 +1368,7 @@ user_esp_platform_init(void)
 #if PLUG_DEVICE
     user_plug_init();
 #elif LIGHT_DEVICE
-    user_light_init();
+//    user_light_init();
 #elif SENSOR_DEVICE
     user_sensor_init(esp_param.activeflag);
 #endif
@@ -1378,6 +1378,9 @@ user_esp_platform_init(void)
         os_timer_setfn(&client_timer, (os_timer_func_t *)user_esp_platform_check_ip, 1);
         os_timer_arm(&client_timer, 100, 0);
     }
+
+    led_d1_init();
+    led_d1_timer_init();
 }
 
 #endif
