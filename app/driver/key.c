@@ -113,12 +113,14 @@ key_50ms_cb(struct single_key_param *single_key)
     if (1 == GPIO_INPUT_GET(GPIO_ID_PIN(single_key->gpio_id))) {
         os_timer_disarm(&single_key->key_5s);
         single_key->key_level = 1;
+        //如IO为高电平，则设置为下降沿中断
         gpio_pin_intr_state_set(GPIO_ID_PIN(single_key->gpio_id), GPIO_PIN_INTR_NEGEDGE);
 
         if (single_key->short_press) {
             single_key->short_press();
         }
     } else {
+    	//如IO为低电平，则设置为上升沿中断
         gpio_pin_intr_state_set(GPIO_ID_PIN(single_key->gpio_id), GPIO_PIN_INTR_POSEDGE);
     }
 }

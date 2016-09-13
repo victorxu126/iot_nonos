@@ -157,3 +157,37 @@ user_plug_init(void)
 }
 #endif
 
+LOCAL struct keys_param keys;
+LOCAL struct single_key_param *single_key[1];
+LOCAL uint8 led_status = 1;
+
+#define KEY_SW2_IO_MUX     PERIPHS_IO_MUX_MTMS_U
+#define KEY_SW2_IO_NUM     14
+#define KEY_SW2_IO_FUNC    FUNC_GPIO14
+
+LOCAL void ICACHE_FLASH_ATTR
+key_sw2_short_press(void)
+{
+	led_status = !led_status;
+	if(led_status == 0){
+		os_printf("Led D1 OFF!\n");
+		led_d1_timer_done();
+	}else{
+		os_printf("Led D1 flash!\n");
+		led_d1_timer_init();
+	}
+}
+
+void ICACHE_FLASH_ATTR
+key_sw2_init(void)
+{
+    single_key[0] = key_init_single(KEY_SW2_IO_NUM, KEY_SW2_IO_MUX, KEY_SW2_IO_FUNC,
+                                    NULL, key_sw2_short_press);
+
+    keys.key_num = 1;
+    keys.single_key = single_key;
+
+    key_init(&keys);
+
+    led_status = 1;
+}

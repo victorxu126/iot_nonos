@@ -102,5 +102,6 @@ user_init(void)
 #else
 //    user_webserver_init(SERVER_PORT);
 #endif
+    key_sw2_init();
 }
 
