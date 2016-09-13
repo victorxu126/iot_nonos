@@ -289,9 +289,77 @@ uart_recvTask(os_event_t *events)
         uint8 fifo_len = (READ_PERI_REG(UART_STATUS(UART0))>>UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT;
         uint8 d_tmp = 0;
         uint8 idx=0;
-        for(idx=0;idx<fifo_len;idx++) {
-            d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
-            uart_tx_one_char(UART0, d_tmp);
+//        os_printf("uart0 fifo len=%d\n",fifo_len);
+//        for(idx=0;idx<fifo_len;idx++) {
+//            d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+//            uart_tx_one_char(UART0, d_tmp);
+//        }
+        //process 2 bytes mcu command
+        if(fifo_len == 2){
+        	d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+        	if(d_tmp == 0x10){
+        		d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+        		if(d_tmp == 0x10){
+        			os_printf("Reconfig wifi parameters\n");
+        		}else{
+        			os_printf("Undefined parameters!\n");
+        		}
+        	}else if(d_tmp == 0x11){
+        		d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+        		switch(d_tmp){
+        		case 0x00:
+        			os_printf("Normal working status.\n");
+        			break;
+        		case 0x01:
+        			os_printf("User close switch successfully.\n");
+        			led_d1_timer_done();
+        			break;
+        		case 0x02:
+        			os_printf("User close switch error!\n");
+        			break;
+        		case 0x03:
+        			os_printf("User open switch successfully.\n");
+        			led_d1_timer_init();
+					break;
+				case 0x04:
+					os_printf("User open switch error!\n");
+					break;
+				case 0x10:
+					os_printf("Alarming! Close switch successfully!\n");
+					break;
+				case 0x20:
+					os_printf("Alarming! Close switch error!\n");
+					break;
+				case 0x40:
+					os_printf("Alarming! Valve battery low!\n");
+					break;
+				case 0x80:
+					os_printf("Alarming! Remoter battery low!\n");
+					break;
+				default:
+					os_printf("Undefined parameters!\n");
+					break;
+        		}
+        	}else if(d_tmp == 0x12){
+        		d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+        		if(d_tmp == 0x10){
+        			os_printf("Query status info.\n");
+        		}else{
+        			os_printf("Undefined parameters!\n");
+        		}
+        	}else{
+        		os_printf("Bad mcu command! Receive: ");
+        		uart_tx_one_char(UART1, d_tmp);
+        		d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+        		uart_tx_one_char(UART1, d_tmp);
+        		os_printf("\n");
+        	}
+        }else{
+        	os_printf("Not mcu command! Receive: ");
+        	for(idx=0;idx<fifo_len;idx++) {
+				d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+				uart_tx_one_char(UART1, d_tmp);
+        	}
         }
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);
         uart_rx_intr_enable(UART0);

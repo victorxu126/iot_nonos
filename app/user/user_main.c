@@ -15,6 +15,7 @@
 
 #include "user_devicefind.h"
 #include "user_webserver.h"
+#include "driver\uart.h"
 
 #if ESP_PLATFORM
 #include "user_esp_platform.h"
@@ -79,6 +80,8 @@ user_rf_pre_init(void)
 void ICACHE_FLASH_ATTR
 user_init(void)
 {
+	uart_init(BIT_RATE_9600,BIT_RATE_9600);
+	UART_SetPrintPort(UART1);	//use UART1 for print info output
     os_printf("SDK version:%s\n", system_get_sdk_version());
 
 #if ESP_PLATFORM
