@@ -1303,21 +1303,27 @@ user_esp_platform_init(void)
 	/***add by tzx for saving ip_info to avoid dhcp_client start****/
     struct dhcp_client_info dhcp_info;
     struct ip_info sta_info;
-    system_rtc_mem_read(64,&dhcp_info,sizeof(struct dhcp_client_info));
-	if(dhcp_info.flag == 0x01 ) {
+    system_rtc_mem_read(64,&dhcp_info,sizeof(struct dhcp_client_info));	//get dhcp_info from RTC_MEM
+	if(dhcp_info.flag == 0x01 ) {	//already get ip address
 		if (true == wifi_station_dhcpc_status())
 		{
-			wifi_station_dhcpc_stop();
+			wifi_station_dhcpc_stop();	//stop dhcp client
 		}
+		//get 8266 module station ip addr from dhcp_info structure
 		sta_info.ip = dhcp_info.ip_addr;
 		sta_info.gw = dhcp_info.gw;
 		sta_info.netmask = dhcp_info.netmask;
-		if ( true != wifi_set_ip_info(STATION_IF,&sta_info)) {
+		if ( true != wifi_set_ip_info(STATION_IF,&sta_info)) {	//set wifi station IP address
 			os_printf("set default ip wrong\n");
+		}else{
+			os_printf("set wifi ip addr=%d.%d.%d.%d\n", IP2STR(&sta_info.ip));
 		}
+
+	}else{
+		os_printf("read from RTC MEM, dhcp_info.flag=0\n");
 	}
     os_memset(&dhcp_info,0,sizeof(struct dhcp_client_info));
-    system_rtc_mem_write(64,&dhcp_info,sizeof(struct rst_info));
+    system_rtc_mem_write(64,&dhcp_info,sizeof(struct rst_info));	//clear dhcp_info in RTM_MEM
 
 
 #if AP_CACHE
@@ -1361,8 +1367,8 @@ user_esp_platform_init(void)
 
         wifi_softap_set_config(&config);
 #endif
-
-        wifi_set_opmode(STATIONAP_MODE);
+//        os_printf("set wifi STATION+AP Mode");
+//        wifi_set_opmode(STATIONAP_MODE);
     }
 
 #if PLUG_DEVICE
@@ -1373,11 +1379,11 @@ user_esp_platform_init(void)
     user_sensor_init(esp_param.activeflag);
 #endif
 
-    if (wifi_get_opmode() != SOFTAP_MODE) {
-        os_timer_disarm(&client_timer);
-        os_timer_setfn(&client_timer, (os_timer_func_t *)user_esp_platform_check_ip, 1);
-        os_timer_arm(&client_timer, 100, 0);
-    }
+//    if (wifi_get_opmode() != SOFTAP_MODE) {
+//        os_timer_disarm(&client_timer);
+//        os_timer_setfn(&client_timer, (os_timer_func_t *)user_esp_platform_check_ip, 1);
+//        os_timer_arm(&client_timer, 100, 0);
+//    }
 
     led_d1_init();
     led_d1_timer_init();
