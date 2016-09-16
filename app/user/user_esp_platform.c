@@ -1386,7 +1386,7 @@ user_esp_platform_init(void)
 //    }
 
     led_d1_init();
-    led_d1_timer_init();
+    led_d1_timer_init(SLOW_FLASH_INTERVAL);
 }
 
 #endif

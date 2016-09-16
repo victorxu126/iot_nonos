@@ -611,4 +611,7 @@ void wifi_unregister_user_ie_manufacturer_recv_cb(void);
 void wifi_enable_gpio_wakeup(uint32 i, GPIO_INT_TYPE intr_status);
 void wifi_disable_gpio_wakeup(void);
 
+#define FAST_FLASH_INTERVAL	200
+#define SLOW_FLASH_INTERVAL 1000
+
 #endif

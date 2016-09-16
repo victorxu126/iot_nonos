@@ -319,7 +319,7 @@ uart_recvTask(os_event_t *events)
         			break;
         		case 0x03:
         			os_printf("User open switch successfully.\n");
-        			led_d1_timer_init();
+//        			led_d1_timer_init(SLOW_FLASH_INTERVAL);
 					break;
 				case 0x04:
 					os_printf("User open switch error!\n");

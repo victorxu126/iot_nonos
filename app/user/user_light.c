@@ -165,11 +165,11 @@ led_d1_timer_cb(void)
 }
 
 void ICACHE_FLASH_ATTR
-led_d1_timer_init(void)
+led_d1_timer_init(uint32 interval)
 {
     os_timer_disarm(&led_d1_timer);
     os_timer_setfn(&led_d1_timer, (os_timer_func_t *)led_d1_timer_cb, NULL);
-    os_timer_arm(&led_d1_timer, 1000, 1);
+    os_timer_arm(&led_d1_timer, interval, 1);
     led_d1_level = 0;
     GPIO_OUTPUT_SET(GPIO_ID_PIN(LED_D1_IO_NUM), led_d1_level);
 }
@@ -178,5 +178,5 @@ void ICACHE_FLASH_ATTR
 led_d1_timer_done(void)
 {
     os_timer_disarm(&led_d1_timer);
-    GPIO_OUTPUT_SET(GPIO_ID_PIN(LED_D1_IO_NUM), 0);
+    GPIO_OUTPUT_SET(GPIO_ID_PIN(LED_D1_IO_NUM), 1);
 }

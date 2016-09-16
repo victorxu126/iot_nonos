@@ -151,6 +151,7 @@ smartconfig_done(sc_status status, void *pdata)
             os_printf("SC_STATUS_FIND_CHANNEL\n");
             break;
         case SC_STATUS_GETTING_SSID_PSWD:
+        	led_d1_timer_init(FAST_FLASH_INTERVAL);	//LED D1 flash fastly
             os_printf("SC_STATUS_GETTING_SSID_PSWD\n");
 			sc_type *type = pdata;
             if (*type == SC_TYPE_ESPTOUCH) {
@@ -180,6 +181,7 @@ smartconfig_done(sc_status status, void *pdata)
 				airkiss_start_discover();
             }
             smartconfig_stop();
+            led_d1_timer_done();	//LED D1 always on
             break;
     }
 
@@ -244,8 +246,8 @@ user_rf_pre_init(void)
 void ICACHE_FLASH_ATTR
 user_init(void)
 {
-	uart_init(BIT_RATE_9600,BIT_RATE_9600);
-	UART_SetPrintPort(UART1);	//use UART1 for print info output
+//	uart_init(BIT_RATE_9600,BIT_RATE_9600);
+//	UART_SetPrintPort(UART1);	//use UART1 for print info output
     os_printf("SDK version:%s\n", system_get_sdk_version());
 
 #if ESP_PLATFORM

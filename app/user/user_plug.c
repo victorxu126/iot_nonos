@@ -174,7 +174,7 @@ key_sw2_short_press(void)
 		led_d1_timer_done();
 	}else{
 		os_printf("Led D1 flash!\n");
-		led_d1_timer_init();
+		led_d1_timer_init(SLOW_FLASH_INTERVAL);
 	}
 }
 
